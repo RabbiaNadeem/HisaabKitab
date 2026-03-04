@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, Suspense, lazy } from 'react'
 import { User, Lock, Palette, ShieldAlert, Sun, Moon, Save, LogOut } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -9,6 +9,11 @@ import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { useAuthContext } from '@/contexts/AuthContext'
+
+// Only loaded in development — excluded from production bundle
+const ApiTestPanel = import.meta.env.DEV
+  ? lazy(() => import('@/components/ApiTestPanel').then(m => ({ default: m.ApiTestPanel })))
+  : null
 import { useUIStore } from '@/store/uiStore'
 import { supabase } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
@@ -215,6 +220,13 @@ export default function SettingsPage() {
           </Button>
         </CardContent>
       </Card>
+
+      {/* ── API Test (dev only) ── */}
+      {import.meta.env.DEV && ApiTestPanel && (
+        <Suspense fallback={null}>
+          <ApiTestPanel />
+        </Suspense>
+      )}
 
       {/* ── Account ── */}
       <Card className="border-destructive/30">

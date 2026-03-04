@@ -63,7 +63,8 @@ export function useAddTransaction() {
       return data as Transaction
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['transactions', user?.id], refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['budgets'] })
     },
   })
 }
@@ -86,7 +87,8 @@ export function useUpdateTransaction() {
       return data as Transaction
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['transactions', user?.id], refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['budgets'] })
     },
   })
 }
@@ -106,7 +108,7 @@ export function useDeleteTransaction() {
       if (error) throw error
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['transactions', user?.id], refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
     },
   })
 }

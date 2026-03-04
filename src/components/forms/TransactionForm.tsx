@@ -1,10 +1,10 @@
-import { useEffect } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import type { Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { format } from 'date-fns'
-import { CalendarIcon } from 'lucide-react'
+import { CalendarIcon, Sparkles, Loader2, WandSparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -28,6 +28,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar'
 import { useCategories } from '@/hooks/useCategories'
 import { useAddTransaction, useUpdateTransaction } from '@/hooks/useTransactions'
+import { useAiParse } from '@/hooks/useAiParse'
 import type { Transaction, TransactionType } from '@/types/database'
 
 const schema = z.object({
@@ -59,7 +60,14 @@ export function TransactionForm({
   const { data: categories = [] } = useCategories()
   const addMutation = useAddTransaction()
   const updateMutation = useUpdateTransaction()
+  const aiParse = useAiParse()
   const isEdit = !!transaction
+
+  // AI input state
+  const [aiText, setAiText] = useState('')
+  const [aiSaving, setAiSaving] = useState(false)
+  const [aiError, setAiError] = useState('')
+  const aiInputRef = useRef<HTMLInputElement>(null)
 
   const {
     register,
@@ -107,10 +115,54 @@ export function TransactionForm({
         currency: 'PKR',
       })
     }
+    // Reset AI state when dialog opens/closes
+    setAiText('')
+    setAiSaving(false)
+    setAiError('')
   }, [transaction, open, defaultType, reset])
 
   const selectedType = watch('type')
   const filteredCategories = categories.filter((c) => c.type === selectedType)
+
+  // Match AI-returned category name to a real category ID
+  function matchCategory(name: string, type: TransactionType): string | null {
+    const lower = name.toLowerCase()
+    const match = categories.find(
+      (c) => c.type === type && c.name.toLowerCase().includes(lower),
+    ) ?? categories.find((c) => c.name.toLowerCase().includes(lower))
+    return match?.id ?? null
+  }
+
+  // Parse → directly save → close dialog
+  async function handleDirectAdd() {
+    if (!aiText.trim()) return
+    setAiError('')
+    setAiSaving(true)
+    try {
+      const parsed = await aiParse.mutateAsync(aiText.trim())
+
+      const [y, mo, d] = parsed.date.split('-').map(Number)
+      const categoryId = matchCategory(parsed.category, parsed.type)
+
+      await addMutation.mutateAsync({
+        type: parsed.type,
+        amount: parsed.amount,
+        description: parsed.description,
+        category_id: categoryId,
+        transaction_date: new Date(y, mo - 1, d).toISOString(),
+        notes: null,
+        tags: null,
+        currency: 'PKR',
+      })
+
+      onOpenChange(false)
+      reset()
+    } catch (err) {
+      setAiError(err instanceof Error ? err.message : 'Failed. Please try again or fill manually.')
+    } finally {
+      setAiSaving(false)
+    }
+  }
 
   const onSubmit = async (values: FormValues) => {
     const payload = {
@@ -143,6 +195,75 @@ export function TransactionForm({
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+
+          {/* ── AI Quick Add ── */}
+          {!isEdit && (
+            <div className="rounded-xl border border-primary/30 bg-primary/5 p-3 space-y-2">
+              <div className="flex items-center gap-1.5">
+                <WandSparkles className="h-3.5 w-3.5 text-primary" />
+                <span className="text-xs font-semibold text-primary uppercase tracking-wide">
+                  AI Quick Add
+                </span>
+                <span className="text-xs text-muted-foreground ml-auto">
+                  Press Enter or tap ✦
+                </span>
+              </div>
+
+              <div className="flex gap-2">
+                <Input
+                  ref={aiInputRef}
+                  value={aiText}
+                  onChange={(e) => { setAiText(e.target.value); setAiError('') }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') { e.preventDefault(); handleDirectAdd() }
+                  }}
+                  placeholder="e.g. Paid Rs.1500 for groceries yesterday"
+                  className="h-9 text-sm bg-background"
+                  disabled={aiSaving}
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={handleDirectAdd}
+                  disabled={aiSaving || !aiText.trim()}
+                  className="h-9 px-3 shrink-0 gap-1.5"
+                >
+                  {aiSaving ? (
+                    <>
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      <span className="text-xs">Adding…</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-3.5 w-3.5" />
+                      <span className="text-xs">Add</span>
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              {aiSaving && (
+                <p className="text-xs text-muted-foreground animate-pulse">
+                  Parsing and saving your transaction…
+                </p>
+              )}
+              {aiError && (
+                <p className="text-xs text-destructive">{aiError}</p>
+              )}
+            </div>
+          )}
+
+          {/* ── Divider ── */}
+          {!isEdit && (
+            <div className="flex items-center gap-3">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-[11px] text-muted-foreground uppercase tracking-wider">
+                or fill manually
+              </span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+          )}
+
           {/* Type toggle */}
           <Controller
             name="type"
