@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
   AreaChart, Area,
   PieChart, Pie, Cell,
@@ -7,7 +7,7 @@ import {
 } from 'recharts'
 import {
   TrendingUp, TrendingDown, Wallet, Percent,
-  Plus, Sparkles, Pencil, Trash2,
+  Plus, Pencil, Trash2,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -19,6 +19,7 @@ import { CurrencyDisplay, formatCurrency } from '@/components/shared/CurrencyDis
 import { CategoryBadge } from '@/components/shared/CategoryBadge'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { TransactionForm } from '@/components/forms/TransactionForm'
+import { AiInsightsCard } from '@/components/shared/AiInsightsCard'
 import type { Transaction } from '@/types/database'
 import { format } from 'date-fns'
 
@@ -98,8 +99,36 @@ export default function DashboardPage() {
   const fullName = (user?.user_metadata?.full_name as string | undefined) ?? user?.email ?? 'there'
   const firstName = fullName.split(' ')[0]
   const currentMonth = format(new Date(), 'MMMM yyyy')
-
   const savingsLabel = `${stats.savingsRate.toFixed(1)}%`
+
+  const aiSummary = useMemo(() => {
+    if (isLoading) return null
+    const totalExpenses = categoryBreakdown.reduce((s, c) => s + c.value, 0)
+    const prevMonthData = monthlyTrend[monthlyTrend.length - 2] ?? { month: '', income: 0, expenses: 0 }
+    return {
+      currentMonth: {
+        name: currentMonth,
+        income: stats.income,
+        expenses: stats.expenses,
+        savingsRate: stats.savingsRate,
+      },
+      prevMonth: {
+        name: prevMonthData.month,
+        income: prevMonthData.income,
+        expenses: prevMonthData.expenses,
+      },
+      categoryBreakdown: categoryBreakdown.map((c) => ({
+        name: c.name,
+        amount: c.value,
+        percentage: totalExpenses > 0 ? (c.value / totalExpenses) * 100 : 0,
+      })),
+      monthlyTrend: monthlyTrend.map((m) => ({
+        month: m.month,
+        income: m.income,
+        expenses: m.expenses,
+      })),
+    }
+  }, [isLoading, stats, categoryBreakdown, monthlyTrend, currentMonth])
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
@@ -298,35 +327,8 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* AI Insights placeholder */}
-        <Card className="lg:col-span-2 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-purple-500/5 pointer-events-none" />
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-primary" />
-              AI Insights
-              <span className="text-[10px] font-normal bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
-                Coming Soon
-              </span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {[
-              { icon: '📊', text: 'Your spending pattern analysis will appear here' },
-              { icon: '💡', text: 'Personalized savings tips based on your habits' },
-              { icon: '⚠️', text: 'Budget alerts and anomaly detection' },
-            ].map((item, i) => (
-              <div key={i} className="flex items-start gap-2.5 rounded-lg bg-muted/50 p-3">
-                <span className="text-base shrink-0">{item.icon}</span>
-                <p className="text-xs text-muted-foreground leading-relaxed">{item.text}</p>
-              </div>
-            ))}
-            <p className="text-[11px] text-muted-foreground text-center pt-1">
-              {/* TODO: AI — Connect to AI service here */}
-              Powered by AI · Analysis engine coming soon
-            </p>
-          </CardContent>
-        </Card>
+        {/* AI Insights */}
+        <AiInsightsCard summary={aiSummary} />
       </div>
 
       {/* Floating + button */}
