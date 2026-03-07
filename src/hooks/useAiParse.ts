@@ -50,15 +50,16 @@ export function useAiParse() {
         throw new Error('No data returned from AI parser')
       }
 
-      // Validate the response structure
-      if (typeof data.amount !== 'number' || 
+      // Validate the response structure — coerce amount to number (AI may return it as a string)
+      const amount = Number(data.amount)
+      if (isNaN(amount) ||
           !['income', 'expense'].includes(data.type) ||
           !data.category || !data.date || !data.description) {
         console.error('Invalid response structure:', data)
         throw new Error('Invalid response from AI parser')
       }
 
-      return data as AiParsedTransaction
+      return { ...data, amount } as AiParsedTransaction
     },
   })
 }

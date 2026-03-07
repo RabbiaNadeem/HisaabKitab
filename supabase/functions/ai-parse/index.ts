@@ -42,7 +42,7 @@ Return ONLY valid JSON, no explanations, no markdown:
   "type": "expense" | "income",
   "category": string,
   "date": "YYYY-MM-DD",
-  "description": string
+  "description": "short clean transaction name (2-5 words, e.g. 'Grocery Shopping', 'Monthly Salary', 'Electricity Bill')"
 }`
 
     // Try models in order — free tiers can be flaky, fallback ensures reliability

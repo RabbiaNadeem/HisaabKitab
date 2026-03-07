@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, type KeyboardEvent } from 'react'
-import { MessageCircle, X, Send, Sparkles, Loader2, Trash2, Zap } from 'lucide-react'
+import { X, Send, Sparkles, Loader2, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useAiChat, type ChatMessage } from '@/hooks/useAiChat'
@@ -21,7 +21,7 @@ function MessageBubble({ message }: { message: ChatMessage }) {
   return (
     <div className={cn('flex gap-2 mb-3', isUser ? 'flex-row-reverse' : 'flex-row')}>
       {!isUser && (
-        <div className="h-7 w-7 shrink-0 rounded-full bg-primary/20 flex items-center justify-center mt-0.5 ring-1 ring-primary/30">
+        <div className="h-7 w-7 shrink-0 rounded-full bg-primary/10 flex items-center justify-center mt-0.5 ring-1 ring-primary/20">
           <Sparkles className="h-3.5 w-3.5 text-primary" />
         </div>
       )}
@@ -29,8 +29,8 @@ function MessageBubble({ message }: { message: ChatMessage }) {
         className={cn(
           'max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed',
           isUser
-            ? 'bg-primary text-primary-foreground rounded-tr-sm'
-            : 'bg-muted text-foreground rounded-tl-sm',
+            ? 'bg-primary/30 text-primary-foreground rounded-tr-sm'
+            : 'bg-muted/90 text-foreground rounded-tl-sm',
         )}
         style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
       >
@@ -135,10 +135,10 @@ export function AiChatAssistant() {
         aria-hidden={!isOpen}
       >
         {/* Header */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-border rounded-t-2xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent shrink-0">
-          <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center ring-1 ring-primary/30">
-            <Zap className="h-4 w-4 text-primary" />
-          </div>
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-border rounded-t-2xl bg-gradient-to-r from-primary/5 via-primary/3 to-transparent shrink-0">
+            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center ring-1 ring-primary/20 overflow-hidden">
+              <img src="/hk-logo-removebg.png" alt="Hisaab AI" className="h-7 w-7 object-contain" />
+              </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-foreground leading-tight">Hisaab AI</p>
             <div className="flex items-center gap-1">
@@ -177,11 +177,8 @@ export function AiChatAssistant() {
           {showWelcome ? (
             /* Welcome screen */
             <div className="flex flex-col items-center text-center py-4 gap-4">
-              <div className="relative">
-                <div className="h-16 w-16 rounded-full bg-primary/15 flex items-center justify-center ring-2 ring-primary/20">
-                  <Sparkles className="h-8 w-8 text-primary" />
-                </div>
-                <span className="absolute -bottom-0.5 -right-0.5 text-lg">🚀</span>
+              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center ring-1 ring-primary/20 overflow-hidden">
+              <img src="/hk-logo-removebg.png" alt="Hisaab AI" className="h-7 w-7 object-contain" />
               </div>
               <div>
                 <p className="text-sm font-bold text-foreground mb-1">
@@ -218,7 +215,7 @@ export function AiChatAssistant() {
         </div>
 
         {/* Input area */}
-        <div className="px-3 pb-3 pt-2 border-t border-border shrink-0">
+          <div className="px-3 pb-3 pt-2 border-t border-border shrink-0">
           <div className="flex gap-2 items-end">
             <textarea
               ref={inputRef}
@@ -260,14 +257,14 @@ export function AiChatAssistant() {
       <div className="fixed bottom-6 right-6 z-50">
         {/* Pulse ring — shown when chat is closed & has no messages */}
         {!isOpen && messages.length === 0 && (
-          <span className="absolute inset-0 rounded-full animate-ping bg-primary/25 pointer-events-none" />
+          <span className="absolute inset-0 rounded-full animate-ping bg-primary/15 pointer-events-none" />
         )}
         <Button
           onClick={() => setIsOpen((o) => !o)}
           size="icon"
           className={cn(
             'h-14 w-14 rounded-full shadow-lg shadow-primary/25',
-            'bg-gradient-to-br from-primary to-primary/75 hover:from-primary/90 hover:to-primary/65',
+            'bg-gradient-to-br from-primary/60 to-primary/40 hover:from-primary/70 hover:to-primary/50',
             'transition-all duration-300',
             isOpen && 'rotate-[360deg]',
           )}
@@ -276,7 +273,7 @@ export function AiChatAssistant() {
           {isOpen ? (
             <X className="h-5 w-5" />
           ) : (
-            <MessageCircle className="h-6 w-6" />
+            <img src="/hk-logo-removebg.png" alt="Hisaab AI" className="h-9 w-9 object-contain" />
           )}
         </Button>
       </div>

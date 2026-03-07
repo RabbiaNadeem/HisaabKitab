@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import { format } from 'date-fns'
 import {
   Search, Pencil, Trash2, CalendarIcon,
-  FileText, ChevronLeft, ChevronRight,
+  FileText, ChevronLeft, ChevronRight, Plus,
 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -172,8 +172,15 @@ export default function TransactionsPage() {
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
           {filtered.length} transaction{filtered.length !== 1 ? 's' : ''}
-          {filtered.length !== allTransactions.length && ` (filtered from ${allTransactions.length})`}
-        </p>
+          {filtered.length !== allTransactions.length && ` (filtered from ${allTransactions.length})`}</p>
+        <Button
+          size="sm"
+          className="gap-1.5"
+          onClick={() => { setEditingTx(null); setTxFormOpen(true) }}
+        >
+          <Plus className="h-4 w-4" />
+          Add Transaction
+        </Button>
       </div>
 
       {/* Table */}

@@ -1,13 +1,20 @@
 import { useState, useMemo } from 'react'
-import { ChevronLeft, ChevronRight, Plus, Pencil, TrendingDown } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Plus, TrendingDown, MoreVertical, Pencil, Trash2 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useBudgets } from '@/hooks/useBudgets'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { useBudgets, useDeleteBudget } from '@/hooks/useBudgets'
 import { useCategories } from '@/hooks/useCategories'
 import { useTransactions } from '@/hooks/useTransactions'
 import { BudgetForm } from '@/components/forms/BudgetForm'
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { CurrencyDisplay, formatCurrency } from '@/components/shared/CurrencyDisplay'
 import type { Budget } from '@/types/database'
 import { cn } from '@/lib/utils'
@@ -47,6 +54,9 @@ export default function BudgetsPage() {
   const [budgetFormOpen, setBudgetFormOpen] = useState(false)
   const [editingBudget, setEditingBudget] = useState<Budget | null>(null)
   const [editingCategoryId, setEditingCategoryId] = useState<string | undefined>()
+  const [deletingBudget, setDeletingBudget] = useState<Budget | null>(null)
+
+  const deleteMutation = useDeleteBudget()
 
   const { data: budgets = [], isLoading: budgetsLoading } = useBudgets(monthYear)
   const { data: categories = [], isLoading: catsLoading } = useCategories()
@@ -184,18 +194,32 @@ export default function BudgetsPage() {
                               Over
                             </Badge>
                           )}
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7"
-                            onClick={() => {
-                              setEditingBudget(budget)
-                              setEditingCategoryId(cat.id)
-                              setBudgetFormOpen(true)
-                            }}
-                          >
-                            <Pencil className="h-3 w-3" />
-                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-7 w-7">
+                                <MoreVertical className="h-3.5 w-3.5" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setEditingBudget(budget)
+                                  setEditingCategoryId(cat.id)
+                                  setBudgetFormOpen(true)
+                                }}
+                              >
+                                <Pencil className="h-3.5 w-3.5 mr-2" />
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="text-destructive focus:text-destructive"
+                                onClick={() => setDeletingBudget(budget)}
+                              >
+                                <Trash2 className="h-3.5 w-3.5 mr-2" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       </div>
 
@@ -297,6 +321,20 @@ export default function BudgetsPage() {
         budget={editingBudget}
         monthYear={monthYear}
         lockedCategoryId={editingCategoryId}
+      />
+
+      <ConfirmDialog
+        open={!!deletingBudget}
+        onOpenChange={(open) => { if (!open) setDeletingBudget(null) }}
+        title="Delete Budget"
+        description="Are you sure you want to delete this budget? This cannot be undone."
+        confirmLabel="Delete"
+        onConfirm={async () => {
+          if (deletingBudget) {
+            await deleteMutation.mutateAsync(deletingBudget.id)
+            setDeletingBudget(null)
+          }
+        }}
       />
     </div>
   )

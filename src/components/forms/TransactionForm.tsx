@@ -75,6 +75,7 @@ export function TransactionForm({
     control,
     watch,
     reset,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema) as Resolver<FormValues>,
@@ -133,7 +134,7 @@ export function TransactionForm({
     return match?.id ?? null
   }
 
-  // Parse → directly save → close dialog
+  // Parse → populate form fields for review
   async function handleDirectAdd() {
     if (!aiText.trim()) return
     setAiError('')
@@ -144,19 +145,15 @@ export function TransactionForm({
       const [y, mo, d] = parsed.date.split('-').map(Number)
       const categoryId = matchCategory(parsed.category, parsed.type)
 
-      await addMutation.mutateAsync({
-        type: parsed.type,
-        amount: parsed.amount,
-        description: parsed.description,
-        category_id: categoryId,
-        transaction_date: new Date(y, mo - 1, d).toISOString(),
-        notes: null,
-        tags: null,
-        currency: 'PKR',
-      })
+      setValue('type', parsed.type, { shouldDirty: true })
+      setValue('amount', parsed.amount, { shouldDirty: true })
+      setValue('description', parsed.description, { shouldDirty: true })
+      setValue('category_id', categoryId, { shouldDirty: true })
+      setValue('transaction_date', new Date(y, mo - 1, d), { shouldDirty: true })
+      setValue('notes', '')
+      setValue('tags', '')
 
-      onOpenChange(false)
-      reset()
+      setAiText('')
     } catch (err) {
       setAiError(err instanceof Error ? err.message : 'Failed. Please try again or fill manually.')
     } finally {
@@ -205,7 +202,7 @@ export function TransactionForm({
                   AI Quick Add
                 </span>
                 <span className="text-xs text-muted-foreground ml-auto">
-                  Press Enter or tap ✦
+                  Press Enter to auto-fill
                 </span>
               </div>
 
@@ -231,12 +228,12 @@ export function TransactionForm({
                   {aiSaving ? (
                     <>
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                      <span className="text-xs">Adding…</span>
+                      <span className="text-xs">Filling…</span>
                     </>
                   ) : (
                     <>
                       <Sparkles className="h-3.5 w-3.5" />
-                      <span className="text-xs">Add</span>
+                      <span className="text-xs">Fill</span>
                     </>
                   )}
                 </Button>
@@ -244,7 +241,7 @@ export function TransactionForm({
 
               {aiSaving && (
                 <p className="text-xs text-muted-foreground animate-pulse">
-                  Parsing and saving your transaction…
+                  Parsing your transaction…
                 </p>
               )}
               {aiError && (
@@ -299,7 +296,7 @@ export function TransactionForm({
               type="number"
               step="0.01"
               placeholder="0.00"
-              {...register('amount')}
+              {...register('amount', { valueAsNumber: true })}
               className={errors.amount ? 'border-destructive' : ''}
             />
             {errors.amount && (

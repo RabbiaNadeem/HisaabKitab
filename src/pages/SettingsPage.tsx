@@ -1,6 +1,9 @@
 import { useState } from 'react'
-import { User, Palette, ShieldAlert, Sun, Moon, Save, LogOut } from 'lucide-react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Palette, Sun, Moon, Save, LogOut,
+  Mail, CheckCircle2, AlertCircle, Sparkles,
+} from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -9,11 +12,6 @@ import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { useAuthContext } from '@/contexts/AuthContext'
-
-// Only loaded in development — excluded from production bundle
-// const ApiTestPanel = import.meta.env.DEV
-//   ? lazy(() => import('@/components/ApiTestPanel').then(m => ({ default: m.ApiTestPanel })))
-//   : null
 import { useUIStore } from '@/store/uiStore'
 import { supabase } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
@@ -30,18 +28,9 @@ export default function SettingsPage() {
   const fullName = user?.user_metadata?.full_name as string | undefined
   const initials = getInitials(fullName, user?.email)
 
-  // Profile form
   const [displayName, setDisplayName] = useState(fullName ?? '')
   const [profileSaving, setProfileSaving] = useState(false)
   const [profileMsg, setProfileMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
-
-  // Password form - commented out for now
-  // const [newPassword, setNewPassword] = useState('')
-  // const [confirmPassword, setConfirmPassword] = useState('')
-  // const [passwordSaving, setPasswordSaving] = useState(false)
-  // const [passwordMsg, setPasswordMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
-
-  // Sign-out confirm
   const [signOutOpen, setSignOutOpen] = useState(false)
 
   async function handleProfileSave() {
@@ -52,142 +41,150 @@ export default function SettingsPage() {
       data: { full_name: displayName.trim() },
     })
     setProfileSaving(false)
-    setProfileMsg(error ? { type: 'error', text: error.message } : { type: 'success', text: 'Profile updated.' })
+    setProfileMsg(error
+      ? { type: 'error', text: error.message }
+      : { type: 'success', text: 'Profile updated successfully.' }
+    )
   }
 
-  // Password change functionality - commented out for now
-  // async function handlePasswordChange() {
-  //   if (newPassword.length < 6) {
-  //     setPasswordMsg({ type: 'error', text: 'Password must be at least 6 characters.' })
-  //     return
-  //   }
-  //   if (newPassword !== confirmPassword) {
-  //     setPasswordMsg({ type: 'error', text: 'Passwords do not match.' })
-  //     return
-  //   }
-  //   setPasswordSaving(true)
-  //   setPasswordMsg(null)
-  //   const { error } = await supabase.auth.updateUser({ password: newPassword })
-  //   setPasswordSaving(false)
-  //   if (error) {
-  //     setPasswordMsg({ type: 'error', text: error.message })
-  //   } else {
-  //     setPasswordMsg({ type: 'success', text: 'Password updated successfully.' })
-  //     setNewPassword('')
-  //     setConfirmPassword('')
-  //   }
-  // }
-
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-2xl mx-auto space-y-5">
 
-      {/* ── Profile ── */}
-      <Card>
-        <CardHeader className="pb-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-              <User className="h-4.5 w-4.5 text-primary" />
-            </div>
-            <div>
-              <CardTitle className="text-base">Profile</CardTitle>
-              <CardDescription className="text-xs">Update your display name</CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center gap-4">
-            <Avatar className="h-14 w-14">
-              <AvatarFallback className="bg-primary/20 text-primary text-lg font-bold">
+      {/* ── Profile card ── */}
+      <Card className="overflow-hidden">
+        {/* Gradient banner */}
+        <div className="h-20 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent" />
+        <CardContent className="pt-0 pb-6 px-6 -mt-8 space-y-5">
+          {/* Avatar row */}
+          <div className="flex items-end justify-between">
+            <Avatar className="h-16 w-16 ring-4 ring-background shadow-lg">
+              <AvatarFallback className="bg-primary text-primary-foreground text-xl font-bold">
                 {initials}
               </AvatarFallback>
             </Avatar>
-            <div>
-              <p className="text-sm font-semibold">{fullName ?? '—'}</p>
-              <p className="text-xs text-muted-foreground">{user?.email}</p>
-            </div>
+            <Badge variant="secondary" className="text-[11px] gap-1 mb-1">
+              <Sparkles className="h-3 w-3" />
+              AI-Powered
+            </Badge>
+          </div>
+
+          {/* Name & email read-only display */}
+          <div>
+            <p className="text-lg font-bold leading-tight">{fullName || displayName || '—'}</p>
+            <p className="text-sm text-muted-foreground flex items-center gap-1.5 mt-0.5">
+              <Mail className="h-3.5 w-3.5" />
+              {user?.email}
+            </p>
           </div>
 
           <Separator />
 
+          {/* Edit display name */}
           <div className="space-y-1.5">
-            <Label htmlFor="displayName">Display Name</Label>
+            <Label htmlFor="displayName" className="text-sm font-medium">Display Name</Label>
             <Input
               id="displayName"
               value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
+              onChange={(e) => { setDisplayName(e.target.value); setProfileMsg(null) }}
               placeholder="Your name"
+              className="h-9"
             />
           </div>
 
+          {/* Read-only email */}
           <div className="space-y-1.5">
-            <Label>Email</Label>
-            <Input value={user?.email ?? ''} disabled className="opacity-60" />
-            <p className="text-xs text-muted-foreground">Email cannot be changed here.</p>
+            <Label className="text-sm font-medium">Email Address</Label>
+            <Input value={user?.email ?? ''} disabled className="h-9 opacity-60 cursor-not-allowed" />
+            <p className="text-xs text-muted-foreground">Email cannot be changed.</p>
           </div>
 
+          {/* Status message */}
           {profileMsg && (
-            <p className={cn('text-xs', profileMsg.type === 'error' ? 'text-destructive' : 'text-primary')}>
+            <div className={cn(
+              'flex items-center gap-2 rounded-lg px-3 py-2 text-xs',
+              profileMsg.type === 'error'
+                ? 'bg-destructive/10 text-destructive'
+                : 'bg-green-500/10 text-green-600 dark:text-green-400'
+            )}>
+              {profileMsg.type === 'error'
+                ? <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                : <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />}
               {profileMsg.text}
-            </p>
+            </div>
           )}
 
-          <Button onClick={handleProfileSave} disabled={profileSaving || !displayName.trim()} size="sm">
-            <Save className="h-3.5 w-3.5 mr-2" />
-            {profileSaving ? 'Saving…' : 'Save Profile'}
+          <Button
+            onClick={handleProfileSave}
+            disabled={profileSaving || !displayName.trim()}
+            size="sm"
+            className="gap-2"
+          >
+            <Save className="h-3.5 w-3.5" />
+            {profileSaving ? 'Saving…' : 'Save Changes'}
           </Button>
         </CardContent>
       </Card>
 
       {/* ── Appearance ── */}
       <Card>
-        <CardHeader className="pb-4">
-          <div className="flex items-center gap-3">
+        <CardContent className="pt-5 pb-5">
+          <div className="flex items-center gap-3 mb-4">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
               <Palette className="h-4.5 w-4.5 text-primary" />
             </div>
             <div>
-              <CardTitle className="text-base">Appearance</CardTitle>
-              <CardDescription className="text-xs">Customize the look and feel</CardDescription>
+              <p className="text-sm font-semibold">Appearance</p>
+              <p className="text-xs text-muted-foreground">Customize the look and feel</p>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between rounded-lg border border-border p-4">
-            <div>
-              <p className="text-sm font-medium">Theme</p>
-              <p className="text-xs text-muted-foreground">
-                Currently using <span className="font-semibold">{theme === 'dark' ? 'Dark' : 'Light'}</span> mode
-              </p>
+
+          <div className="flex items-center justify-between rounded-xl border border-border bg-muted/30 px-4 py-3">
+            <div className="flex items-center gap-3">
+              {theme === 'dark'
+                ? <Moon className="h-4 w-4 text-muted-foreground" />
+                : <Sun className="h-4 w-4 text-amber-500" />}
+              <div>
+                <p className="text-sm font-medium">{theme === 'dark' ? 'Dark Mode' : 'Light Mode'}</p>
+                <p className="text-xs text-muted-foreground">
+                  {theme === 'dark' ? 'Easy on the eyes at night' : 'Bright and clear view'}
+                </p>
+              </div>
             </div>
-            <Button variant="outline" size="sm" onClick={toggleTheme} className="gap-2">
-              {theme === 'dark' ? (
-                <><Sun className="h-4 w-4" /> Light Mode</>
-              ) : (
-                <><Moon className="h-4 w-4" /> Dark Mode</>
+            <button
+              onClick={toggleTheme}
+              className={cn(
+                'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:outline-none',
+                theme === 'dark' ? 'bg-primary' : 'bg-input'
               )}
-            </Button>
+            >
+              <span
+                className={cn(
+                  'inline-block h-4 w-4 rounded-full bg-white shadow transition-transform',
+                  theme === 'dark' ? 'translate-x-6' : 'translate-x-1'
+                )}
+              />
+            </button>
           </div>
         </CardContent>
       </Card>
 
-      {/* ── Account ── */}
+      {/* ── Danger zone ── */}
       <Card className="border-destructive/30">
-        <CardHeader className="pb-4">
-          <div className="flex items-center gap-3">
+        <CardContent className="pt-5 pb-5">
+          <div className="flex items-center gap-3 mb-4">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-destructive/10">
-              <ShieldAlert className="h-4.5 w-4.5 text-destructive" />
+              <LogOut className="h-4.5 w-4.5 text-destructive" />
             </div>
             <div>
-              <CardTitle className="text-base">Account</CardTitle>
-              <CardDescription className="text-xs">Sign out of your account</CardDescription>
+              <p className="text-sm font-semibold">Account</p>
+              <p className="text-xs text-muted-foreground">Manage your session</p>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between rounded-lg border border-destructive/20 bg-destructive/5 p-4">
+
+          <div className="flex items-center justify-between rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-3">
             <div>
               <p className="text-sm font-medium">Sign Out</p>
-              <p className="text-xs text-muted-foreground">You will be redirected to the sign-in page.</p>
+              <p className="text-xs text-muted-foreground">You'll be redirected to the sign-in page.</p>
             </div>
             <Button
               variant="destructive"
@@ -195,18 +192,19 @@ export default function SettingsPage() {
               className="gap-2"
               onClick={() => setSignOutOpen(true)}
             >
-              <LogOut className="h-4 w-4" />
+              <LogOut className="h-3.5 w-3.5" />
               Sign Out
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* ── App info ── */}
-      <div className="text-center text-xs text-muted-foreground pb-4 space-x-2">
-        <span>HisaabKitab</span>
-        <Badge variant="outline" className="text-[10px] py-0">v1.0.0</Badge>
-        <span>AI-powered Personal Finance Tracker</span>
+      {/* ── Footer ── */}
+      <div className="flex items-center justify-center gap-2 pb-4 text-xs text-muted-foreground">
+        <span className="font-semibold text-foreground/60">HisaabKitab</span>
+        <Badge variant="outline" className="text-[10px] py-0 px-1.5">v1.0.0</Badge>
+        <span>·</span>
+        <span>AI-powered Personal Finance</span>
       </div>
 
       <ConfirmDialog
