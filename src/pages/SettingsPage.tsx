@@ -1,5 +1,5 @@
-import { useState, Suspense, lazy } from 'react'
-import { User, Lock, Palette, ShieldAlert, Sun, Moon, Save, LogOut } from 'lucide-react'
+import { useState } from 'react'
+import { User, Palette, ShieldAlert, Sun, Moon, Save, LogOut } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,9 +11,9 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { useAuthContext } from '@/contexts/AuthContext'
 
 // Only loaded in development — excluded from production bundle
-const ApiTestPanel = import.meta.env.DEV
-  ? lazy(() => import('@/components/ApiTestPanel').then(m => ({ default: m.ApiTestPanel })))
-  : null
+// const ApiTestPanel = import.meta.env.DEV
+//   ? lazy(() => import('@/components/ApiTestPanel').then(m => ({ default: m.ApiTestPanel })))
+//   : null
 import { useUIStore } from '@/store/uiStore'
 import { supabase } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
@@ -35,11 +35,11 @@ export default function SettingsPage() {
   const [profileSaving, setProfileSaving] = useState(false)
   const [profileMsg, setProfileMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
-  // Password form
-  const [newPassword, setNewPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [passwordSaving, setPasswordSaving] = useState(false)
-  const [passwordMsg, setPasswordMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  // Password form - commented out for now
+  // const [newPassword, setNewPassword] = useState('')
+  // const [confirmPassword, setConfirmPassword] = useState('')
+  // const [passwordSaving, setPasswordSaving] = useState(false)
+  // const [passwordMsg, setPasswordMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   // Sign-out confirm
   const [signOutOpen, setSignOutOpen] = useState(false)
@@ -55,27 +55,28 @@ export default function SettingsPage() {
     setProfileMsg(error ? { type: 'error', text: error.message } : { type: 'success', text: 'Profile updated.' })
   }
 
-  async function handlePasswordChange() {
-    if (newPassword.length < 6) {
-      setPasswordMsg({ type: 'error', text: 'Password must be at least 6 characters.' })
-      return
-    }
-    if (newPassword !== confirmPassword) {
-      setPasswordMsg({ type: 'error', text: 'Passwords do not match.' })
-      return
-    }
-    setPasswordSaving(true)
-    setPasswordMsg(null)
-    const { error } = await supabase.auth.updateUser({ password: newPassword })
-    setPasswordSaving(false)
-    if (error) {
-      setPasswordMsg({ type: 'error', text: error.message })
-    } else {
-      setPasswordMsg({ type: 'success', text: 'Password updated successfully.' })
-      setNewPassword('')
-      setConfirmPassword('')
-    }
-  }
+  // Password change functionality - commented out for now
+  // async function handlePasswordChange() {
+  //   if (newPassword.length < 6) {
+  //     setPasswordMsg({ type: 'error', text: 'Password must be at least 6 characters.' })
+  //     return
+  //   }
+  //   if (newPassword !== confirmPassword) {
+  //     setPasswordMsg({ type: 'error', text: 'Passwords do not match.' })
+  //     return
+  //   }
+  //   setPasswordSaving(true)
+  //   setPasswordMsg(null)
+  //   const { error } = await supabase.auth.updateUser({ password: newPassword })
+  //   setPasswordSaving(false)
+  //   if (error) {
+  //     setPasswordMsg({ type: 'error', text: error.message })
+  //   } else {
+  //     setPasswordMsg({ type: 'success', text: 'Password updated successfully.' })
+  //     setNewPassword('')
+  //     setConfirmPassword('')
+  //   }
+  // }
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
@@ -169,65 +170,6 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      {/* ── Security ── */}
-      <Card>
-        <CardHeader className="pb-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-              <Lock className="h-4.5 w-4.5 text-primary" />
-            </div>
-            <div>
-              <CardTitle className="text-base">Security</CardTitle>
-              <CardDescription className="text-xs">Change your password</CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="newPassword">New Password</Label>
-            <Input
-              id="newPassword"
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Min. 6 characters"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Re-enter new password"
-            />
-          </div>
-
-          {passwordMsg && (
-            <p className={cn('text-xs', passwordMsg.type === 'error' ? 'text-destructive' : 'text-primary')}>
-              {passwordMsg.text}
-            </p>
-          )}
-
-          <Button
-            onClick={handlePasswordChange}
-            disabled={passwordSaving || !newPassword || !confirmPassword}
-            size="sm"
-          >
-            <Save className="h-3.5 w-3.5 mr-2" />
-            {passwordSaving ? 'Updating…' : 'Update Password'}
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* ── API Test (dev only) ── */}
-      {import.meta.env.DEV && ApiTestPanel && (
-        <Suspense fallback={null}>
-          <ApiTestPanel />
-        </Suspense>
-      )}
-
       {/* ── Account ── */}
       <Card className="border-destructive/30">
         <CardHeader className="pb-4">
@@ -264,7 +206,7 @@ export default function SettingsPage() {
       <div className="text-center text-xs text-muted-foreground pb-4 space-x-2">
         <span>HisaabKitab</span>
         <Badge variant="outline" className="text-[10px] py-0">v1.0.0</Badge>
-        <span>· Personal Finance Tracker</span>
+        <span>AI-powered Personal Finance Tracker</span>
       </div>
 
       <ConfirmDialog

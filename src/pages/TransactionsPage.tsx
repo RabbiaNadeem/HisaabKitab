@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { format } from 'date-fns'
 import {
-  Search, Plus, Pencil, Trash2, CalendarIcon,
+  Search, Pencil, Trash2, CalendarIcon,
   FileText, ChevronLeft, ChevronRight,
 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
@@ -174,10 +174,6 @@ export default function TransactionsPage() {
           {filtered.length} transaction{filtered.length !== 1 ? 's' : ''}
           {filtered.length !== allTransactions.length && ` (filtered from ${allTransactions.length})`}
         </p>
-        <Button size="sm" onClick={() => { setEditingTx(null); setTxFormOpen(true) }}>
-          <Plus className="h-4 w-4 mr-1" />
-          Add Transaction
-        </Button>
       </div>
 
       {/* Table */}
@@ -319,15 +315,6 @@ export default function TransactionsPage() {
           </div>
         </div>
       )}
-
-      {/* Floating + button */}
-      <button
-        onClick={() => { setEditingTx(null); setTxFormOpen(true) }}
-        className="fixed bottom-8 right-8 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all"
-        aria-label="Add transaction"
-      >
-        <Plus className="h-6 w-6" />
-      </button>
 
       <TransactionForm
         open={txFormOpen}

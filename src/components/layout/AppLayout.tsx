@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 import { useUIStore } from '@/store/uiStore'
+import { AiChatAssistant } from '@/components/chat/AiChatAssistant'
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -28,6 +29,8 @@ export function AppLayout({ children }: AppLayoutProps) {
           {children}
         </main>
       </div>
+
+      <AiChatAssistant />
     </div>
   )
 }

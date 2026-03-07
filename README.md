@@ -10,7 +10,8 @@ A smart personal finance tracker built with React, TypeScript, and Supabase — 
 - 💸 **Transactions** — Add, edit, delete income and expense transactions
 - 🤖 **AI Quick Add** — Type "Paid Rs.1500 for groceries yesterday" and it saves instantly
 - 🧠 **AI Insights** — Get 4 AI-generated financial insights on your Dashboard every month
-- 📁 **Categories** — Organize transactions with custom categories and icons
+- � **AI Chat Assistant** — Ask Hisaab AI anything about your finances with predictive forecasting
+- �📁 **Categories** — Organize transactions with custom categories and icons
 - 💰 **Budgets** — Set monthly budgets per category with progress tracking
 - 🎯 **Goals** — Track savings goals with target amounts and deadlines
 - 📊 **Dashboard** — Overview of income, expenses, balance, and spending trends
@@ -100,6 +101,46 @@ supabase functions deploy ai-insights --no-verify-jwt
 
 ---
 
+## 💬 AI Chat Assistant
+
+HisaabKitab features a **floating AI chat assistant** that answers questions about your finances using your actual data. The AI proactively predicts future scenarios like "if you spend Rs.5000 more, you'll run out of money this month."
+
+**Key capabilities:**
+- **Predictive forecasting** — Daily burn rate, projected month-end balance, budget overruns
+- **Personalized advice** — Based on your spending patterns, goals, and historical data
+- **Proactive warnings** — Alerts about potential deficits or unachievable goals
+- **Conversational interface** — Ask anything in natural language
+
+**How it works:**
+```
+User clicks floating chat button
+  → AI Chat Assistant opens with suggested questions
+        ↓
+User types: "Will I meet my savings goal?"
+        ↓
+React calls supabase.functions.invoke('ai-chat') with:
+  • Full conversation history
+  • Live financial context (income, expenses, budgets, goals, trends)
+        ↓
+Edge Function (Deno) sends everything to OpenRouter API
+  → OPENROUTER_API_KEY stored securely in Supabase secrets
+        ↓
+Returns enthusiastic, predictive response
+        ↓
+AI responds with specific numbers and actionable insights
+```
+
+**Deploy the Edge Function:**
+```bash
+supabase functions deploy ai-chat --no-verify-jwt
+```
+
+**Example interactions:**
+- "How am I doing this month?" → "You're on track with Rs.15,000 saved so far! But at your current burn rate of Rs.2,500/day, you'll end the month with Rs.8,000 — keep it up!"
+- "Can I afford a Rs.50,000 vacation?" → "With your current savings rate of Rs.12,000/month, you'd need 4 more months to save Rs.50,000. But if you cut dining expenses by Rs.3,000/month, you could reach it in 3 months!"
+
+---
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -138,6 +179,7 @@ supabase secrets set OPENROUTER_API_KEY=sk-or-v1-your-key-here
 ```bash
 supabase functions deploy ai-parse --no-verify-jwt
 supabase functions deploy ai-insights --no-verify-jwt
+supabase functions deploy ai-chat --no-verify-jwt
 ```
 
 ### 5. Run the development server
@@ -158,6 +200,8 @@ pnpm build
 hisaabkitab/
 ├── src/
 │   ├── components/
+│   │   ├── chat/
+│   │   │   └── AiChatAssistant.tsx    # Floating AI chat interface
 │   │   ├── forms/
 │   │   │   └── TransactionForm.tsx   # Add/Edit form with AI Quick Add
 │   │   ├── layout/                   # AppLayout, Header, Sidebar
@@ -166,6 +210,7 @@ hisaabkitab/
 │   ├── contexts/
 │   │   └── AuthContext.tsx
 │   ├── hooks/
+│   │   ├── useAiChat.ts              # AI chat assistant hook
 │   │   ├── useAiParse.ts             # AI transaction parsing hook
 │   │   ├── useAiInsights.ts          # AI insights hook
 │   │   ├── useTransactions.ts
@@ -185,6 +230,8 @@ hisaabkitab/
 │       └── database.ts               # TypeScript types
 ├── supabase/
 │   └── functions/
+│       ├── ai-chat/
+│       │   └── index.ts              # Edge Function — conversational AI with predictive forecasting
 │       ├── ai-parse/
 │       │   └── index.ts              # Edge Function — natural language → transaction JSON
 │       └── ai-insights/
