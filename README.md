@@ -6,7 +6,7 @@ A smart personal finance tracker built with React, TypeScript, and Supabase — 
 
 ## ✨ Features
 
-- 🔐 **Authentication** — Sign up / Sign in via Supabase Auth
+- 🔐 **Authentication** — Sign up / Sign in via Supabase Auth with glassmorphic UI
 - 💸 **Transactions** — Add, edit, delete income and expense transactions
 - 🤖 **AI Quick Add** — Type "Paid Rs.1500 for groceries yesterday" and it saves instantly
 - 🧠 **AI Insights** — Get 4 AI-generated financial insights on your Dashboard every month
@@ -16,6 +16,7 @@ A smart personal finance tracker built with React, TypeScript, and Supabase — 
 - 📊 **Dashboard** — Overview of income, expenses, balance, and spending trends
 - 📈 **Reports** — Visual charts and category breakdowns
 - 🌙 **Dark / Light Mode** — Theme toggle with persistent preference
+- 🎨 **Glassmorphic Design** — Modern auth pages with animated gradients and floating shapes
 
 ---
 
@@ -56,7 +57,7 @@ Appears instantly in Dashboard and Transactions tab
 
 **Deploy the Edge Function:**
 ```bash
-supabase functions deploy ai-insights --no-verify-jwt
+supabase functions deploy ai-parse --no-verify-jwt
 ```
 
 ```

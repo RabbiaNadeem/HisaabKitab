@@ -131,5 +131,76 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', 'SF Pro Display', system-ui, sans-serif;
   }
+}
+
+/* ── Auth page animated background ────────────────────────────────────────── */
+@keyframes auth-blob {
+  0%, 100% { transform: translate(0px, 0px) scale(1); }
+  33%       { transform: translate(55px, -65px) scale(1.07); }
+  66%       { transform: translate(-35px, 42px) scale(0.94); }
+}
+@keyframes auth-aura {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(40px, -30px) scale(1.05); }
+}
+@keyframes auth-float-1 {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50%      { transform: translateY(-18px) rotate(12deg); }
+}
+@keyframes auth-float-2 {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50%      { transform: translateY(14px) rotate(-8deg); }
+}
+@keyframes auth-float-3 {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50%      { transform: translateY(-10px) rotate(6deg); }
+}
+@keyframes auth-float-4 {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50%      { transform: translateY(-22px) rotate(-10deg); }
+}
+@keyframes auth-float-5 {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50%      { transform: translateY(16px) rotate(14deg); }
+}
+@keyframes auth-float-6 {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50%      { transform: translateY(-12px) rotate(-6deg); }
+}
+@keyframes auth-float-7 {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50%      { transform: translateY(20px) rotate(10deg); }
+}
+
+.auth-blob   { animation: auth-blob 22s ease-in-out infinite; }
+.auth-blob-2 { animation: auth-blob 28s ease-in-out infinite -9s; }
+.auth-blob-3 { animation: auth-blob 24s ease-in-out infinite -5s; }
+.auth-aura-1 { animation: auth-aura 18s ease-in-out infinite; }
+.auth-aura-2 { animation: auth-aura 22s ease-in-out infinite -8s; }
+.auth-shape-1 { animation: auth-float-1 14s ease-in-out infinite; }
+.auth-shape-2 { animation: auth-float-2 18s ease-in-out infinite -4s; }
+.auth-shape-3 { animation: auth-float-3 16s ease-in-out infinite -7s; }
+.auth-shape-4 { animation: auth-float-4 20s ease-in-out infinite -3s; }
+.auth-shape-5 { animation: auth-float-5 17s ease-in-out infinite -6s; }
+.auth-shape-6 { animation: auth-float-6 22s ease-in-out infinite -2s; }
+.auth-shape-7 { animation: auth-float-7 15s ease-in-out infinite -9s; }
+
+/* Gradient border card */
+.glass-card-border {
+  position: relative;
+}
+.glass-card-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.20), transparent 60%);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  pointer-events: none;
 }

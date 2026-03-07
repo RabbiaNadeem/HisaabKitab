@@ -23,7 +23,6 @@ const signUpSchema = z
 
 type SignUpFormData = z.infer<typeof signUpSchema>
 
-// ── Icons ──────────────────────────────────────────────────────────────────────
 function EyeIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -43,7 +42,7 @@ function EyeOffIcon() {
 function FieldError({ msg }: { msg?: string }) {
   if (!msg) return null
   return (
-    <p className="text-xs text-red-400 flex items-center gap-1 mt-1.5">
+    <p className="mt-1.5 flex items-center gap-1 text-xs text-red-400/90">
       <svg className="h-3 w-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
         <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
       </svg>
@@ -52,19 +51,6 @@ function FieldError({ msg }: { msg?: string }) {
   )
 }
 
-function LogoMark({ size = 'md' }: { size?: 'sm' | 'md' }) {
-  const dim = size === 'sm' ? 'h-8 w-8' : 'h-10 w-10'
-  const icon = size === 'sm' ? 'h-4 w-4' : 'h-5 w-5'
-  return (
-    <div className={`${dim} rounded-xl bg-[#00F0FF] flex items-center justify-center shadow-lg shadow-[#00F0FF]/25`}>
-      <svg className={`${icon} text-black`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-      </svg>
-    </div>
-  )
-}
-
-// ── Password strength meter ────────────────────────────────────────────────────
 function getStrength(pw: string): { score: number; label: string; color: string } {
   if (!pw) return { score: 0, label: '', color: '' }
   let score = 0
@@ -91,7 +77,7 @@ function StrengthMeter({ value }: { value: string }) {
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className={`h-1 flex-1 rounded-full transition-all duration-300 ${i <= score ? color : 'bg-white/10'}`}
+            className={`h-0.5 flex-1 rounded-full transition-all duration-300 ${i <= score ? color : 'bg-white/[0.08]'}`}
           />
         ))}
       </div>
@@ -101,9 +87,6 @@ function StrengthMeter({ value }: { value: string }) {
     </div>
   )
 }
-
-// ── Step indicators ────────────────────────────────────────────────────────────
-const steps = ['Account', 'Security', 'Done']
 
 export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -135,32 +118,35 @@ export default function SignUpPage() {
   // ── Success screen ──────────────────────────────────────────────────────────
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0c0c0f] px-4">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#00F0FF]/[0.06] rounded-full blur-[150px]" />
+      <div className="relative min-h-screen overflow-hidden px-4 flex items-center justify-center"
+        style={{ background: 'linear-gradient(135deg, #06121a 0%, #08080e 30%, #071a1c 60%, #0a0a12 100%)' }}>
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="auth-aura-1 absolute top-1/2 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#00F0FF] opacity-[0.05] blur-[180px]" />
         </div>
-        <div className="relative w-full max-w-sm text-center">
-          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-sm p-10">
-            <div className="mx-auto mb-6 relative w-20 h-20">
-              <div className="absolute inset-0 rounded-full bg-[#00F0FF]/20 animate-ping opacity-75" />
-              <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-[#00F0FF]/10 border border-[#00F0FF]/30">
+        <div className="relative z-10 w-full max-w-sm text-center">
+          <div className="glass-card-border rounded-3xl border border-white/[0.07] bg-white/[0.04] p-10 shadow-[0_8px_40px_rgba(0,0,0,0.45)]"
+            style={{ backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
+            <div className="mx-auto mb-7 relative h-20 w-20">
+              <div className="absolute inset-0 rounded-full bg-[#00F0FF]/20 animate-ping opacity-60" />
+              <div className="relative flex h-20 w-20 items-center justify-center rounded-full border border-[#00F0FF]/25 bg-[#00F0FF]/[0.08]">
                 <svg className="h-9 w-9 text-[#00F0FF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               </div>
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2">Check your inbox</h2>
-            <p className="text-gray-400 text-sm leading-relaxed mb-8">
+            <h2 className="text-2xl font-semibold text-white mb-2" style={{ letterSpacing: '-0.02em' }}>Check your inbox</h2>
+            <p className="text-white/40 text-sm leading-relaxed mb-8">
               We've sent a verification link to your email. Click it to activate your account and get started.
             </p>
             <button
               onClick={() => navigate('/sign-in')}
-              className="w-full py-3 rounded-xl bg-[#00F0FF] hover:bg-[#00F0FF]/80 text-black font-semibold text-sm
-                transition-all shadow-lg shadow-[#00F0FF]/20 active:scale-[0.98]"
+              className="w-full rounded-xl bg-[#00F0FF] py-3 text-sm font-semibold text-black
+                shadow-[0_0_24px_rgba(0,240,255,0.22)] transition-all duration-200
+                hover:bg-[#00F0FF]/90 hover:shadow-[0_0_32px_rgba(0,240,255,0.32)] active:scale-[0.98]"
             >
               Go to Sign In
             </button>
-            <p className="mt-4 text-xs text-gray-600">Didn't receive it? Check your spam folder.</p>
+            <p className="mt-4 text-xs text-white/20">Didn't receive it? Check your spam folder.</p>
           </div>
         </div>
       </div>
@@ -169,110 +155,100 @@ export default function SignUpPage() {
 
   // ── Sign up form ────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen flex bg-[#0c0c0f]">
-      {/* ── Left branding panel ───────────────────────────────────────────── */}
-      <div className="hidden lg:flex lg:w-[46%] flex-col justify-between p-14 relative overflow-hidden bg-[#0e0e12]">
-        <div className="absolute -top-40 -left-40 w-[500px] h-[500px] bg-[#00F0FF]/[0.06] rounded-full blur-[140px] pointer-events-none" />
-        <div className="absolute bottom-0 right-0 w-80 h-80 bg-[#00F0FF]/[0.04] rounded-full blur-[120px] pointer-events-none" />
+    <div className="relative min-h-screen overflow-hidden px-4 py-12 flex items-center justify-center"
+      style={{ background: 'linear-gradient(135deg, #06121a 0%, #08080e 30%, #071a1c 60%, #0a0a12 100%)' }}>
 
-        {/* Logo */}
-        <div className="relative z-10 flex items-center gap-3">
-          <LogoMark />
-          <span className="text-white font-bold text-xl tracking-tight">HisaabKitab</span>
+      {/* ── Mesh-gradient base blobs ────────────────────────────────────── */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="auth-blob absolute -top-48 -right-32 h-[520px] w-[520px] rounded-full bg-[#00F0FF] opacity-[0.06] blur-[160px]" />
+        <div className="auth-blob-2 absolute left-[-120px] top-1/3 h-[480px] w-[480px] rounded-full bg-[#36454F] opacity-[0.12] blur-[140px]" />
+        <div className="auth-blob-3 absolute bottom-[-60px] right-1/3 h-[400px] w-[400px] rounded-full bg-[#003B3F] opacity-[0.08] blur-[130px]" />
+      </div>
+
+      {/* ── Aura spheres (5% opacity, slow oscillation) ─────────────────── */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="auth-aura-1 absolute top-[15%] right-[15%] h-[460px] w-[460px] rounded-full bg-[#00E68A] opacity-[0.05] blur-[180px]" />
+        <div className="auth-aura-2 absolute bottom-[12%] left-[10%] h-[500px] w-[500px] rounded-full bg-[#0066FF] opacity-[0.05] blur-[180px]" />
+      </div>
+
+      {/* ── Floating 3D geometric shapes (Electric Teal) ────────────────── */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        {/* Toroid / ring */}
+        <div className="auth-shape-1 absolute left-[-5%]">
+          <div className="h-60 w-60 rounded-full border-[6px] border-[#00F0FF]/[0.07]"
+            style={{ boxShadow: 'inset 0 0 20px rgba(0,240,255,0.04), 0 0 30px rgba(0,240,255,0.03)' }} />
         </div>
-
-        {/* Copy */}
-        <div className="relative z-10 space-y-8">
-          <div>
-                <p className="text-xs font-semibold tracking-widest text-[#00F0FF]/70 uppercase mb-4">Start for free</p>
-            <h2 className="text-5xl font-extrabold text-white leading-[1.1] tracking-tight">
-              Your money,<br />
-              <span className="text-[#00F0FF]">your story</span>
-            </h2>
-            <p className="mt-5 text-gray-400 text-[15px] leading-relaxed max-w-[320px]">
-              Join thousands of people who have taken control of their personal finances with HisaabKitab.
-            </p>
-          </div>
-
-          {/* Social proof */}
-          <div className="space-y-4">
-            {[
-              { stat: '10k+', label: 'Active users' },
-              { stat: 'Rs. 2Cr+', label: 'Expenses tracked' },
-              { stat: '100%', label: 'Free forever' },
-            ].map((item) => (
-              <div
-                key={item.stat}
-                className="flex items-center gap-4 rounded-2xl border border-white/[0.06] bg-white/[0.03] px-5 py-4"
-              >
-                <span className="text-2xl font-extrabold text-[#00F0FF]">{item.stat}</span>
-                <span className="text-sm text-gray-400">{item.label}</span>
-              </div>
-            ))}
+        {/* Glass sphere */}
+        <div className="auth-shape-2 absolute bottom-[18%] right-[12%]">
+          <div className="h-100 w-100 rounded-full bg-[#00F0FF]/[0.04] border border-[#00F0FF]/[0.08]"
+            style={{ boxShadow: 'inset 4px -4px 12px rgba(0,240,255,0.05), 0 0 40px rgba(0,240,255,0.03)', backdropFilter: 'blur(6px)' }} />
+        </div>
+        {/* Large double-ring */}
+        <div className="auth-shape-3 absolute top-[15%] right-[2%]">
+          <div className="h-60 w-60 rounded-full border-[10px] border-[#00F0FF]/[0.10]"
+            style={{ boxShadow: 'inset 0 0 30px rgba(0,240,255,0.04), 0 0 40px rgba(0,240,255,0.03)' }}>
+            <div className="absolute inset-4 rounded-full border-[2px] border-[#00F0FF]/[0.06]" />
           </div>
         </div>
-
-        <div className="relative z-10 rounded-2xl border border-white/[0.06] bg-white/[0.02] px-5 py-4">
-          <p className="text-sm text-gray-400 italic">"Beware of little expenses; a small leak will sink a great ship."</p>
-          <p className="mt-2 text-xs text-gray-600">— Benjamin Franklin</p>
+        {/* Glass sphere */}
+        <div className="auth-shape-4 absolute top-[50%] left-[10%]">
+          <div className="h-48 w-48 rounded-full bg-[#00F0FF]/[0.04] border border-[#00F0FF]/[0.08]"
+            style={{ boxShadow: 'inset 4px -4px 12px rgba(0,240,255,0.05), 0 0 40px rgba(0,240,255,0.03)', backdropFilter: 'blur(6px)' }} />
+        </div>
+        {/* Large circle outline */}
+        <div className="auth-shape-5 absolute bottom-[50%] right-[50%]">
+          <div className="h-120 w-120 rounded-full border-[2px] border-[#00F0FF]/[0.08] bg-[#00F0FF]/[0.02]"
+            style={{ boxShadow: '0 0 50px rgba(0,240,255,0.04)' }} />
+        </div>
+        {/* Large double-ring */}
+        <div className="auth-shape-3 absolute bottom-[4%] left-[32%]">
+          <div className="h-20 w-20 rounded-full border-[10px] border-[#00F0FF]/[0.10]"
+            style={{ boxShadow: 'inset 0 0 10px rgba(0,240,255,0.04), 0 0 10px rgba(0,240,255,0.03)' }}>
+            <div className="absolute inset-4 rounded-full border-[2px] border-[#00F0FF]/[0.06]" />
+          </div>
         </div>
       </div>
 
-      {/* ── Divider ───────────────────────────────────────────────────────── */}
-      <div className="hidden lg:block w-px bg-white/[0.06] shrink-0" />
-
-      {/* ── Right form panel ──────────────────────────────────────────────── */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 lg:px-14 relative overflow-y-auto">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#00F0FF]/[0.04] rounded-full blur-[100px] pointer-events-none" />
-
-        {/* Mobile logo */}
-        <div className="lg:hidden mb-10 flex items-center gap-3">
-          <LogoMark size="sm" />
-          <span className="text-white font-bold text-xl">HisaabKitab</span>
+      <div className="relative z-10 w-full max-w-[440px] py-6">
+        {/* Branding */}
+        <div className="mb-10 flex flex-col items-center gap-3">
+          <img
+            src="/hk-logo-removebg.png"
+            alt="HisaabKitab Logo"
+            className="h-20 w-auto"
+          />
         </div>
 
-        <div className="w-full max-w-[400px] relative z-10">
-          {/* Progress steps */}
-          <div className="flex items-center gap-2 mb-8">
-            {steps.map((step, i) => (
-              <div key={step} className="flex items-center gap-2 flex-1">
-                <div className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold
-                  ${i < 2 ? 'bg-[#00F0FF] text-black' : 'bg-white/10 text-gray-500'}`}>
-                  {i + 1}
-                </div>
-                <span className={`text-xs font-medium ${i < 2 ? 'text-[#00F0FF]' : 'text-gray-600'}`}>{step}</span>
-                {i < steps.length - 1 && <div className="flex-1 h-px bg-white/10 ml-1" />}
-              </div>
-            ))}
-          </div>
-
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-white tracking-tight">Create your account</h1>
-            <p className="mt-2 text-sm text-gray-500">Start managing your finances for free — no credit card needed</p>
+        {/* Frosted glass card */}
+        <div className="glass-card-border rounded-3xl border border-white/[0.07] bg-white/[0.04] p-8 shadow-[0_8px_40px_rgba(0,0,0,0.45)]"
+          style={{ backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
+          <div className="mb-7">
+            <h1 className="text-[1.65rem] font-semibold text-white" style={{ letterSpacing: '-0.02em' }}>Create your account</h1>
+            <p className="mt-1.5 text-sm text-white/35">Free forever — no credit card needed</p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
             {/* Full Name */}
             <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-gray-300 mb-1.5">
+              <label htmlFor="fullName" className="mb-1.5 block text-[13px] font-medium text-white/55">
                 Full name
               </label>
               <input
                 id="fullName"
                 type="text"
                 autoComplete="name"
-                placeholder="Talha Zaheer"
+                placeholder="Your name"
                 {...register('fullName')}
-                className={`w-full rounded-xl px-4 py-3 bg-white/[0.05] border text-white text-sm placeholder-gray-600
-                  focus:outline-none focus:ring-2 focus:ring-[#00F0FF]/40 focus:border-[#00F0FF]/40 transition-all duration-150
-                  ${errors.fullName ? 'border-red-500/60 bg-red-500/[0.05]' : 'border-white/10 hover:border-white/20'}`}
+                className={`w-full rounded-xl border bg-white/[0.10] px-4 py-3 text-sm text-white placeholder-white/20 outline-none transition-all duration-200
+                  focus:border-[#00F0FF]/60 focus:bg-white/[0.12] focus:shadow-[0_0_0_3px_rgba(0,240,255,0.12),0_0_18px_rgba(0,240,255,0.10)]
+                  ${errors.fullName ? 'border-red-500/40 bg-red-500/[0.06]' : 'border-white/[0.08] hover:border-white/[0.15]'}`}
               />
               <FieldError msg={errors.fullName?.message} />
             </div>
 
             {/* Email */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1.5">
+              <label htmlFor="email" className="mb-1.5 block text-[13px] font-medium text-white/55">
                 Email address
               </label>
               <input
@@ -281,16 +257,16 @@ export default function SignUpPage() {
                 autoComplete="email"
                 placeholder="you@example.com"
                 {...register('email')}
-                className={`w-full rounded-xl px-4 py-3 bg-white/[0.05] border text-white text-sm placeholder-gray-600
-                  focus:outline-none focus:ring-2 focus:ring-[#00F0FF]/40 focus:border-[#00F0FF]/40 transition-all duration-150
-                  ${errors.email ? 'border-red-500/60 bg-red-500/[0.05]' : 'border-white/10 hover:border-white/20'}`}
+                className={`w-full rounded-xl border bg-white/[0.10] px-4 py-3 text-sm text-white placeholder-white/20 outline-none transition-all duration-200
+                  focus:border-[#00F0FF]/60 focus:bg-white/[0.12] focus:shadow-[0_0_0_3px_rgba(0,240,255,0.12),0_0_18px_rgba(0,240,255,0.10)]
+                  ${errors.email ? 'border-red-500/40 bg-red-500/[0.06]' : 'border-white/[0.08] hover:border-white/[0.15]'}`}
               />
               <FieldError msg={errors.email?.message} />
             </div>
 
             {/* Password */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1.5">
+              <label htmlFor="password" className="mb-1.5 block text-[13px] font-medium text-white/55">
                 Password
               </label>
               <div className="relative">
@@ -300,14 +276,14 @@ export default function SignUpPage() {
                   autoComplete="new-password"
                   placeholder="Min. 8 chars, 1 uppercase, 1 number"
                   {...register('password')}
-                  className={`w-full rounded-xl px-4 py-3 pr-11 bg-white/[0.05] border text-white text-sm placeholder-gray-600
-                    focus:outline-none focus:ring-2 focus:ring-[#00F0FF]/40 focus:border-[#00F0FF]/40 transition-all duration-150
-                    ${errors.password ? 'border-red-500/60 bg-red-500/[0.05]' : 'border-white/10 hover:border-white/20'}`}
+                  className={`w-full rounded-xl border bg-white/[0.10] px-4 py-3 pr-11 text-sm text-white placeholder-white/20 outline-none transition-all duration-200
+                    focus:border-[#00F0FF]/60 focus:bg-white/[0.12] focus:shadow-[0_0_0_3px_rgba(0,240,255,0.12),0_0_18px_rgba(0,240,255,0.10)]
+                    ${errors.password ? 'border-red-500/40 bg-red-500/[0.06]' : 'border-white/[0.08] hover:border-white/[0.15]'}`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/25 transition-colors hover:text-white/60"
                   tabIndex={-1}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
@@ -320,7 +296,7 @@ export default function SignUpPage() {
 
             {/* Confirm password */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-1.5">
+              <label htmlFor="confirmPassword" className="mb-1.5 block text-[13px] font-medium text-white/55">
                 Confirm password
               </label>
               <div className="relative">
@@ -330,14 +306,14 @@ export default function SignUpPage() {
                   autoComplete="new-password"
                   placeholder="Repeat your password"
                   {...register('confirmPassword')}
-                  className={`w-full rounded-xl px-4 py-3 pr-11 bg-white/[0.05] border text-white text-sm placeholder-gray-600
-                    focus:outline-none focus:ring-2 focus:ring-[#00F0FF]/40 focus:border-[#00F0FF]/40 transition-all duration-150
-                    ${errors.confirmPassword ? 'border-red-500/60 bg-red-500/[0.05]' : 'border-white/10 hover:border-white/20'}`}
+                  className={`w-full rounded-xl border bg-white/[0.10] px-4 py-3 pr-11 text-sm text-white placeholder-white/20 outline-none transition-all duration-200
+                    focus:border-[#00F0FF]/60 focus:bg-white/[0.12] focus:shadow-[0_0_0_3px_rgba(0,240,255,0.12),0_0_18px_rgba(0,240,255,0.10)]
+                    ${errors.confirmPassword ? 'border-red-500/40 bg-red-500/[0.06]' : 'border-white/[0.08] hover:border-white/[0.15]'}`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirm((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/25 transition-colors hover:text-white/60"
                   tabIndex={-1}
                   aria-label={showConfirm ? 'Hide password' : 'Show password'}
                 >
@@ -348,17 +324,17 @@ export default function SignUpPage() {
             </div>
 
             {/* Terms note */}
-            <p className="text-xs text-gray-600 leading-relaxed">
+            <p className="text-[12px] text-white/25 leading-relaxed">
               By creating an account you agree to our{' '}
-              <a href="#" className="text-gray-400 hover:text-[#00F0FF] transition-colors underline underline-offset-2">Terms of Service</a>
+              <a href="#" className="text-white/40 transition-colors hover:text-[#00F0FF] underline underline-offset-2">Terms of Service</a>
               {' '}and{' '}
-              <a href="#" className="text-gray-400 hover:text-[#00F0FF] transition-colors underline underline-offset-2">Privacy Policy</a>.
+              <a href="#" className="text-white/40 transition-colors hover:text-[#00F0FF] underline underline-offset-2">Privacy Policy</a>.
             </p>
 
             {/* Server error */}
             {serverError && (
-              <div className="flex items-start gap-3 rounded-xl bg-red-500/[0.08] border border-red-500/20 px-4 py-3">
-                <svg className="h-4 w-4 text-red-400 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <div className="flex items-start gap-3 rounded-xl border border-red-500/20 bg-red-500/[0.06] px-4 py-3">
+                <svg className="mt-0.5 h-4 w-4 shrink-0 text-red-400" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                 </svg>
                 <p className="text-sm text-red-400">{serverError}</p>
@@ -369,15 +345,15 @@ export default function SignUpPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 rounded-xl bg-[#00F0FF] hover:bg-[#00F0FF]/80 active:scale-[0.98]
-                text-black font-semibold text-sm tracking-wide transition-all duration-150
-                shadow-lg shadow-[#00F0FF]/20
-                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00F0FF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c0c0f]
-                disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
+              className="mt-1 w-full rounded-xl bg-[#00F0FF] py-3 text-sm font-semibold tracking-wide text-black
+                shadow-[0_0_24px_rgba(0,240,255,0.22)] transition-all duration-200
+                hover:bg-[#00F0FF]/90 hover:shadow-[0_0_32px_rgba(0,240,255,0.32)]
+                active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00F0FF]/60"
             >
               {isSubmitting ? (
                 <span className="flex items-center justify-center gap-2">
-                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                  <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                   </svg>
@@ -387,19 +363,12 @@ export default function SignUpPage() {
             </button>
           </form>
 
-          <div className="mt-6 flex items-center gap-3">
-            <div className="flex-1 h-px bg-white/[0.05]" />
-            <span className="text-xs text-gray-600">Already have an account?</span>
-            <div className="flex-1 h-px bg-white/[0.05]" />
-          </div>
-
-          <Link
-            to="/sign-in"
-            className="mt-4 flex w-full items-center justify-center py-3 rounded-xl bg-white/[0.04] border border-white/10
-              hover:bg-white/[0.08] hover:border-white/20 text-sm font-medium text-gray-300 transition-all duration-150"
-          >
-            Sign in to your account
-          </Link>
+          <p className="mt-7 text-center text-[13px] text-white/30">
+            Already have an account?{' '}
+            <Link to="/sign-in" className="font-medium text-[#00F0FF]/70 transition-colors hover:text-[#00F0FF]">
+              Sign in
+            </Link>
+          </p>
         </div>
       </div>
     </div>

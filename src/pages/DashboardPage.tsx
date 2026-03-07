@@ -268,7 +268,7 @@ export default function DashboardPage() {
       <div className="grid gap-6 lg:grid-cols-5">
         {/* Recent Transactions */}
         <Card className="lg:col-span-3">
-          <CardHeader className="flex-row items-center justify-between pb-3">
+          <CardHeader className="flex flex-row items-center justify-between pb-3 gap-0">
             <CardTitle className="text-base">Recent Transactions</CardTitle>
             <Button variant="ghost" size="sm" asChild>
               <a href="/transactions" className="text-xs text-primary">View all →</a>
@@ -277,13 +277,13 @@ export default function DashboardPage() {
           <CardContent className="space-y-0 p-0">
             {isLoading ? (
               <div className="px-6 pb-4 space-y-3">
-                {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}
+                {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}
               </div>
             ) : recentTransactions.length === 0 ? (
               <p className="px-6 pb-4 text-sm text-muted-foreground">No transactions yet. Add your first one!</p>
             ) : (
               <div className="divide-y divide-border">
-                {recentTransactions.map((tx) => (
+                {recentTransactions.slice(0, 4).map((tx) => (
                   <div key={tx.id} className="flex items-center gap-3 px-6 py-3 hover:bg-muted/30 transition-colors group">
                     {/* Category icon */}
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted text-base">
