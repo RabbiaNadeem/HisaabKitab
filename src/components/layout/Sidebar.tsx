@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard,
@@ -31,6 +32,14 @@ const NAV_ITEMS = [
 export function Sidebar() {
   const { sidebarOpen, toggleSidebar } = useUIStore()
   const { pathname } = useLocation()
+  const [tooltipsReady, setTooltipsReady] = useState(false)
+
+  // Suppress tooltips during the sidebar open/close animation (300ms)
+  useEffect(() => {
+    setTooltipsReady(false)
+    const t = setTimeout(() => setTooltipsReady(!sidebarOpen), 350)
+    return () => clearTimeout(t)
+  }, [sidebarOpen])
 
   const isActive = (path: string) =>
     path === '/' ? pathname === '/' : pathname.startsWith(path)
@@ -74,7 +83,7 @@ export function Sidebar() {
               HisaabKitab
             </p>
             <p className="text-[10px] text-muted-foreground tracking-wider uppercase">
-              Personal Finance
+              AI-Powered Personal Finance
             </p>
           </div>
         </div>
@@ -95,7 +104,7 @@ export function Sidebar() {
           </div>
 
           {NAV_ITEMS.map(({ label, path, icon: Icon }) => (
-            <Tooltip key={path} delayDuration={0}>
+            <Tooltip key={path} delayDuration={300}>
               <TooltipTrigger asChild>
                 <NavLink
                   to={path}
@@ -127,7 +136,7 @@ export function Sidebar() {
                   )}
                 </NavLink>
               </TooltipTrigger>
-              {!sidebarOpen && (
+              {tooltipsReady && (
                 <TooltipContent side="right" className="font-medium">
                   {label}
                 </TooltipContent>
@@ -138,7 +147,7 @@ export function Sidebar() {
 
         {/* Collapse button */}
         <div className="p-2 border-t border-sidebar-border shrink-0">
-          <Tooltip delayDuration={0}>
+          <Tooltip delayDuration={300}>
             <TooltipTrigger asChild>
               <Button
                 variant="ghost"
@@ -159,7 +168,7 @@ export function Sidebar() {
                 )}
               </Button>
             </TooltipTrigger>
-            {!sidebarOpen && (
+            {tooltipsReady && (
               <TooltipContent side="right" className="font-medium">
                 Expand Sidebar
               </TooltipContent>

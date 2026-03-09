@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, type KeyboardEvent } from 'react'
+import React, { useState, useRef, useEffect, type KeyboardEvent } from 'react'
 import { X, Send, Sparkles, Loader2, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -12,6 +12,33 @@ const SUGGESTED_QUESTIONS = [
   { text: 'Am I on track with my goals?', emoji: '🎯' },
   { text: 'How can I improve my savings?', emoji: '💰' },
 ]
+
+// ─── Inline markdown renderer (bold / italic) ────────────────────────────────
+
+function renderMarkdown(text: string): React.ReactNode[] {
+  const parts: React.ReactNode[] = []
+  // Matches **bold**, *italic*, _italic_
+  const regex = /\*\*(.+?)\*\*|\*(.+?)\*|_(.+?)_/gs
+  let lastIndex = 0
+  let match: RegExpExecArray | null
+  let key = 0
+
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index))
+    }
+    if (match[1] !== undefined) {
+      parts.push(<strong key={key++}>{match[1]}</strong>)
+    } else {
+      parts.push(<em key={key++}>{match[2] ?? match[3]}</em>)
+    }
+    lastIndex = regex.lastIndex
+  }
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex))
+  }
+  return parts
+}
 
 // ─── Single message bubble ────────────────────────────────────────────────────
 
@@ -34,7 +61,7 @@ function MessageBubble({ message }: { message: ChatMessage }) {
         )}
         style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
       >
-        {message.content}
+        {renderMarkdown(message.content)}
       </div>
     </div>
   )
@@ -227,7 +254,7 @@ export function AiChatAssistant() {
                 'flex-1 min-h-[40px] max-h-[100px] resize-none rounded-xl text-sm py-2.5 px-3',
                 'bg-muted border border-border focus:border-primary/50 focus:ring-1 focus:ring-primary/30',
                 'placeholder:text-muted-foreground text-foreground outline-none transition-colors',
-                'scrollbar-thin',
+                'overflow-y-hidden',
               )}
               rows={1}
               disabled={isLoading}
