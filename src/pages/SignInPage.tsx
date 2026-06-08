@@ -50,6 +50,7 @@ export default function SignInPage() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<SignInFormData>({ resolver: zodResolver(signInSchema) })
 
@@ -215,6 +216,23 @@ export default function SignInPage() {
                 </span>
               ) : 'Sign In'}
             </button>
+
+            {/* Demo account note */}
+            <div className="mt-3 rounded-xl border border-white/[0.04] bg-white/[0.02] px-4 py-3 text-sm text-white/40">
+              <strong className="text-white block mb-1">Demo account</strong>
+              <div>Email: admin@gmail.com</div>
+              <div>password: Admin12345</div>
+              <button
+                type="button"
+                onClick={() => {
+                  setValue('email', 'admin@gmail.com')
+                  setValue('password', 'Admin12345')
+                }}
+                className="mt-2 inline-flex items-center gap-2 rounded-md bg-[#00F0FF] px-3 py-1 text-sm font-medium text-black hover:opacity-90"
+              >
+                Use demo account
+              </button>
+            </div>
           </form>
 
           <p className="mt-7 text-center text-[13px] text-white/30">

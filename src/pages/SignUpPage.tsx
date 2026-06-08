@@ -109,7 +109,13 @@ export default function SignUpPage() {
     setServerError('')
     const { error } = await signUp(data.email, data.password, data.fullName)
     if (error) {
-      setServerError(error.message ?? 'Failed to create account. Please try again.')
+      console.error('Sign up error:', error)
+      try {
+        const text = typeof error === 'string' ? error : error.message ?? JSON.stringify(error)
+        setServerError(text)
+      } catch (e) {
+        setServerError('Failed to create account. Please try again.')
+      }
     } else {
       setSuccess(true)
     }
